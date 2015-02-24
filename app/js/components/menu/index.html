@@ -1,0 +1,9 @@
+<ul class="nav nav-pills nav-stacked" data-bind="foreach: $parent.items">
+
+	<li data-bind="css: { active: $index() == $parentContext.$parent.tab() }">
+
+		<a data-bind="text: $data.label, attr: {href: $data.route}"></a>
+		
+	</li>
+
+</ul>
