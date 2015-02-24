@@ -1,0 +1,1 @@
+{  "name": "voc-app",  "version": "1.0.0",  "description": "todo",  "main": "main.js",  "scripts": {    "test": "grunt"  },  "repository": {    "type": "git",    "url": "https://github.com/Gonxo/voc-app.git"  },  "author": "Pau Peinado",  "license": "BSD-2-Clause",  "bugs": {    "url": "https://github.com/Gonxo/voc-app/issues"  }}
