@@ -39,6 +39,15 @@ function(ko, BaseVM, CategoriesTmpl, CategoryTmpl) {
 			self.render(CategoriesTmpl);
 		});
 
+		// Delete list
+		this.app.route('delete', '#/categories', function(ctx){
+
+			if(confirm('Do you really want to remove all categories?')) {
+				self.items([]);
+				self.app.store.clear('categories');
+			}
+		});
+
 		// Add
 		this.app.route('get', '#/category/add', function(ctx){
 
