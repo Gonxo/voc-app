@@ -1,10 +1,16 @@
 <h2 class="text-center" data-bind="text: title"></h2>
 
-<div class="btn-group btn-group-sm" role="group" aria-label="...">
+<div class="row">
 
 	<a href="#/category/add" class="btn btn-success">
 		<span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add new
 	</a>
+
+	<form method="delete" action="#/categories" style="display: inline">
+		<button type="submit" class="btn btn-danger">
+			<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Delete all
+		</button>
+	</form>
 
 </div>
 
