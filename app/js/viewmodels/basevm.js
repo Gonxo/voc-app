@@ -1,6 +1,8 @@
-define(['../app', 'knockout'],
+define(['../app', 'sammy', 'knockout'],
 
-function(App, ko) {
+function(App, Sammy, ko) {
+
+	//console.log(Sammy.Store);
 
 	var vm = {
 

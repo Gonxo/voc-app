@@ -1,0 +1,21 @@
+<h2 class="text-center" data-bind="text: title"></h2>
+
+<div class="btn-group btn-group-sm" role="group" aria-label="...">
+
+	<a href="#/category/add" class="btn btn-success">
+		<span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add new
+	</a>
+
+</div>
+
+<hr />
+
+<div class="list-group" data-bind="foreach: items">
+
+	<a class="list-group-item" data-bind="attr: {href: '#/category/edit/' + $data.id()}, text: $data.label"></a>
+
+</div>
+
+<div data-bind="visible: items().length == 0">
+	<div class="alert alert-info" role="alert">Nothing in categories</div>
+</div>
