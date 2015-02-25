@@ -10,4 +10,5 @@ function(ko){
 
 		ko.applyBindings(component.viewModel, component.element);
 	}
+	
 });

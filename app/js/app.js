@@ -1,7 +1,9 @@
-define(['sammy', 'knockout', 'controllers/routes', 'components/_loader'],
+define(['sammy'],
 
-function(Sammy, ko, routes){
+function(Sammy){
 
-	return new Sammy('#vocApp');
+	// Returns the Sammy Application instance
+	
+	return Sammy('#vocApp');
 
 });
