@@ -10,7 +10,7 @@ function(ko, BaseVM, CategoriesTmpl, CategoryTmpl) {
 
 		if(data) {
 			this.id(data.id);
-			this.label(data.label);
+			this.label(data.label.toLowerCase());
 			this.description(data.description);
 		}
 	}
@@ -32,7 +32,7 @@ function(ko, BaseVM, CategoriesTmpl, CategoryTmpl) {
 		}));
 
 
-		// List
+		// Get list
 		this.app.route('get', '#/categories', function(ctx){
 
 			self.title = 'Categories';
@@ -48,17 +48,28 @@ function(ko, BaseVM, CategoriesTmpl, CategoryTmpl) {
 			}
 		});
 
-		// Add
-		this.app.route('get', '#/category/add', function(ctx){
+		// Gets a category
+		this.app.route('get', '#/category/:id', function(ctx){
 
-			self.item = new Category();
-			self.title = 'Add new category';
-			self.action = '#' + ctx.path.split('/#')[1];
+			self.action = '#/category';
+
+			if(ctx.params.id === "add") {
+				self.item = new Category();
+				self.title = 'Add new category!';
+			} else {
+				self.item = ko.utils.arrayFirst(self.items(), function(item) {
+					if(item.id() == ctx.params.id)
+						return item;
+				});
+				self.title = 'Edit category!';
+				self.action += '/' + self.item.id();
+			}
 
 			self.render(CategoryTmpl);
 		});
 
-		this.app.route('post', '#/category/add', function(ctx){
+		// Create category
+		this.app.route('post', '#/category', function(ctx){
 				
 			// TODO: Check label not exists 
 			ctx.params.id = (self.items().length > 0) ?
@@ -73,24 +84,8 @@ function(ko, BaseVM, CategoriesTmpl, CategoryTmpl) {
 			window.location.hash = '#/categories';
 		});
 
-		// Edit
-		this.app.route('get', '#/category/edit/:id', function(ctx){
-
-			self.item = ko.utils.arrayFirst(self.items(), function(item) {
-				if(item.id() == ctx.params.id)
-					return item;
-			});
-			
-			if(self.item) {
-				
-				self.title = 'Edit category';
-				self.action = '#' + ctx.path.split('/#')[1];
-
-				self.render(CategoryTmpl);
-			}
-		});
-
-		this.app.route('put', '#/category/edit/:id', function(ctx){
+		// Edit category
+		this.app.route('put', '#/category/:id', function(ctx){
 
 			self.item = ko.utils.arrayFirst(self.items(), function(item) {
 				if(item.id() == ctx.params.id)
@@ -104,6 +99,21 @@ function(ko, BaseVM, CategoriesTmpl, CategoryTmpl) {
 			self.app.store.set('categories', ko.toJSON(self.items()));
 
 			window.location.hash = '#/categories';
+		});
+
+		// Delete category
+		this.app.route('delete', '#/category/:id', function(ctx){
+
+			if(confirm("Do you really want to remove this category?")) {
+
+				var index = false;
+				ko.utils.arrayFirst(self.items(), function(item, idx) {
+					if(item.id() == ctx.params.id)
+						index = idx;
+				});
+				self.items.splice(index, 1);
+				self.app.store.set('categories', ko.toJSON(self.items()));
+			}
 		});
 	}
 

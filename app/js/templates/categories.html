@@ -6,7 +6,8 @@
 		<span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add new
 	</a>
 
-	<form method="delete" action="#/categories" style="display: inline">
+	<form method="delete" action="#/categories" style="display: inline"
+		  data-bind="visible: items().length > 0">
 		<button type="submit" class="btn btn-danger">
 			<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Delete all
 		</button>
@@ -16,11 +17,22 @@
 
 <hr />
 
-<div class="list-group" data-bind="foreach: items">
+<ul class="list-group" data-bind="foreach: items">
 
-	<a class="list-group-item" data-bind="attr: {href: '#/category/edit/' + $data.id()}, text: $data.label"></a>
+	<li class="list-group-item clearfix">
+		<a data-bind="attr: {href: '#/category/' + $data.id()}" title="Edit">
+			<strong data-bind="text: $data.label" class="col-sm-2"></strong>
+			<span data-bind="text: $data.description().substring(0,50) + '...'"  class="col-sm-8"></span>
+		</a>
+		<form method="delete" class="pull-right" 
+			  data-bind="attr: {action: '#/category/' + $data.id()}">
+			<button type="submit" class="btn btn-xs btn-danger" title="Delete">
+				<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+			</button>
+		</form>
+	</li>
 
-</div>
+</ul>
 
 <div data-bind="visible: items().length == 0">
 	<div class="alert alert-info" role="alert">Nothing in categories</div>
