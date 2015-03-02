@@ -1,0 +1,39 @@
+<h2 class="text-center" data-bind="text: title"></h2>
+
+<div class="row">
+
+	<a href="#/word/add" class="btn btn-success">
+		<span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add new
+	</a>
+
+	<form method="delete" action="#/words" style="display: inline"
+		  data-bind="visible: items().length > 0">
+		<button type="submit" class="btn btn-danger">
+			<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Delete all
+		</button>
+	</form>
+
+</div>
+
+<hr />
+
+<ul class="list-group" data-bind="foreach: items">
+
+	<li class="list-group-item clearfix">
+		<a data-bind="attr: {href: '#/word/' + $data.id()}" title="Edit">
+			<strong data-bind="text: $data.label" class="col-sm-2"></strong>
+			<span data-bind="text: $data.description().substring(0,50) + '...'"  class="col-sm-8"></span>
+		</a>
+		<form method="delete" class="pull-right" 
+			  data-bind="attr: {action: '#/word/' + $data.id()}">
+			<button type="submit" class="btn btn-xs btn-danger" title="Delete">
+				<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+			</button>
+		</form>
+	</li>
+
+</ul>
+
+<div data-bind="visible: items().length == 0">
+	<div class="alert alert-info" role="alert">Nothing in words</div>
+</div>

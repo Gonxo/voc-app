@@ -1,0 +1,21 @@
+<h2 class="text-center" data-bind="text: title"></h2>
+
+<form data-bind="attr: { action: action, method: item.id() ? 'put' : 'post' }, with: item">
+
+	<div class="form-group">
+		<label for="category_label">Category</label><br />
+		<input type="text" name="label" id="category_label" class="form-control"
+			   data-bind="value: label, valueUpdate: 'afterkeydown'" />
+	</div>
+
+	<div class="form-group">
+		<label for="category_description">Short description</label><br />
+		<textarea name="description" id="category_description" class="form-control"
+				  data-bind="value: description, valueUpdate: 'afterkeydown'"></textarea>
+	</div>
+
+	<a href="#/categories" class="btn btn-danger">Cancel</a>
+	<button type="submit" class="btn btn-success"
+			data-bind="visible: label() && description()">Save</button>
+
+</form>

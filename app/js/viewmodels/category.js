@@ -1,121 +1,108 @@
-define(['knockout', './basevm', 'text!../templates/categories.html', 'text!../templates/category.html'],
+define(['knockout', 'komapping', './basevm',
+		'text!../templates/category/edit.html', 'text!../templates/category/list.html'],
 
-function(ko, BaseVM, CategoriesTmpl, CategoryTmpl) {
+function(ko, komapping, BaseVM, EditTmpl, ListTmpl) {
 
-	function Category(data){
+	// Single category view-model
+	var Category = {
+		id: ko.observable(),
+		label: ko.observable(),
+		description: ko.observable(),
+	},
+		VM = ko.utils.extend({ KEYSTORE: 'categories', items: ko.observableArray() }, BaseVM);
 
-		this.id = ko.observable();
-		this.label = ko.observable();
-		this.description = ko.observable();
+// Gets list of categories
+	VM.get_list = function(ctx){
 
-		if(data) {
-			this.id(data.id);
-			this.label(data.label.toLowerCase());
-			this.description(data.description);
-		}
-	}
-
-	function Categories() {
-
-		var self = this;
-
-		ko.utils.extend(self, BaseVM);
-
-		this.items = ko.observableArray();
-		
-
-	// Initially, check for categories in LocalStorage
-		this.items(
-			ko.utils.arrayMap(self.app.store.get('categories') || [],
+		// Initially, check for categories in LocalStorage
+		VM.items(
+			ko.utils.arrayMap(VM.store.get(VM.KEYSTORE) || [],
 				function(item) {
-					return new Category(item);
+					return komapping.fromJS(item, Category);
 		}));
 
+		VM.title = 'Categories';
+		VM.render(ListTmpl);
+	};
 
-		// Get list
-		this.app.route('get', '#/categories', function(ctx){
+// Deletes list of categoires
+	VM.delete_list = function(ctx) {
 
-			self.title = 'Categories';
-			self.render(CategoriesTmpl);
-		});
+		if(confirm('Do you really want to remove all categories?')) {
+			VM.items([]);
+			VM.store.clear(VM.KEYSTORE);
+			// TODO: delete all words
+		}
+	};
 
-		// Delete list
-		this.app.route('delete', '#/categories', function(ctx){
+// Gets category
+	VM.get_item = function(ctx) {
 
-			if(confirm('Do you really want to remove all categories?')) {
-				self.items([]);
-				self.app.store.clear('categories');
-			}
-		});
+		VM.action = '#/category';
 
-		// Gets a category
-		this.app.route('get', '#/category/:id', function(ctx){
-
-			self.action = '#/category';
-
-			if(ctx.params.id === "add") {
-				self.item = new Category();
-				self.title = 'Add new category!';
-			} else {
-				self.item = ko.utils.arrayFirst(self.items(), function(item) {
-					if(item.id() == ctx.params.id)
-						return item;
-				});
-				self.title = 'Edit category!';
-				self.action += '/' + self.item.id();
-			}
-
-			self.render(CategoryTmpl);
-		});
-
-		// Create category
-		this.app.route('post', '#/category', function(ctx){
-				
-			// TODO: Check label not exists 
-			ctx.params.id = (self.items().length > 0) ?
-				self.items()[self.items().length-1].id()+1 : 1;
-
-			// Push new item at collection
-			self.items.push(new Category(ctx.params));
-
-			// Save entire collection at LocalStorage
-			self.app.store.set('categories', ko.toJSON(self.items()));
-
-			window.location.hash = '#/categories';
-		});
-
-		// Edit category
-		this.app.route('put', '#/category/:id', function(ctx){
-
-			self.item = ko.utils.arrayFirst(self.items(), function(item) {
+		if(ctx.params.id === "add") {
+			VM.item = Category;
+			VM.title = 'Add new category';
+		} else {
+			VM.item = ko.utils.arrayFirst(VM.items(), function(item) {
 				if(item.id() == ctx.params.id)
 					return item;
 			});
+			VM.title = 'Edit category';
+			VM.action += '/' + VM.item.id();
+		}
 
-			self.item.label(ctx.params.label);
-			self.item.description(ctx.params.description);
+		VM.render(EditTmpl);
+	};
 
-			// Save entire collection at LocalStorage
-			self.app.store.set('categories', ko.toJSON(self.items()));
+// Create category
+	VM.post_item = function(ctx) {
 
-			window.location.hash = '#/categories';
+		// TODO: Check label not exists 
+		ctx.params.id = (VM.items().length > 0) ?
+			VM.items()[VM.items().length-1].id()+1 : 1;
+
+		// Push new item at collection
+		VM.items.push(komapping.fromJS(ctx.params, Category));
+
+		// Save entire collection at LocalStorage
+		VM.store.set(VM.KEYSTORE, ko.toJSON(VM.items()));
+
+		window.location.hash = '#/categories';
+	};
+
+// Edit category
+	VM.put_item = function(ctx) {
+
+		VM.item = ko.utils.arrayFirst(VM.items(), function(item) {
+			if(item.id() == ctx.params.id)
+				return item;
 		});
 
-		// Delete category
-		this.app.route('delete', '#/category/:id', function(ctx){
+		VM.item.label(ctx.params.label);
+		VM.item.description(ctx.params.description);
 
-			if(confirm("Do you really want to remove this category?")) {
+		// Save entire collection at LocalStorage
+		VM.store.set(VM.KEYSTORE, ko.toJSON(VM.items()));
 
-				var index = false;
-				ko.utils.arrayFirst(self.items(), function(item, idx) {
-					if(item.id() == ctx.params.id)
-						index = idx;
-				});
-				self.items.splice(index, 1);
-				self.app.store.set('categories', ko.toJSON(self.items()));
-			}
-		});
-	}
+		window.location.hash = '#/categories';
+	};
 
-	return new Categories();
+// Delete category
+	VM.delete_item = function(ctx) {
+
+		if(confirm("Do you really want to remove this category?")) {
+
+			var index = false;
+			ko.utils.arrayFirst(VM.items(), function(item, idx) {
+				if(item.id() == ctx.params.id)
+					index = idx;
+			});
+			VM.items.splice(index, 1);
+			VM.store.set(VM.KEYSTORE, ko.toJSON(VM.items()));
+			// TODO: delete related words
+		}
+	};
+
+	return VM;
 });

@@ -1,26 +1,27 @@
-define(['../app', 'sammy', 'knockout'],
+define(['knockout', '../app'],
 
-function(App, Sammy, ko) {
+function(ko, App) {
 
-	//console.log(Sammy.Store);
+	var VM = {
 
-	var vm = {
-
-		app: App,
+		store: App.store,
 
 		selector: App.$element().find('#appView').selector,
-
 	};
 
-	vm.render = function(htmlString) {
+	VM.render = function(htmlString) {
 
-		ko.cleanNode( $(vm.selector)[0] );
+		ko.cleanNode( $(VM.selector)[0] );
 			
-		$(vm.selector).html(htmlString);
+		$(VM.selector).html(htmlString);
 
-		ko.applyBindings(this, $(vm.selector)[0] );
+		ko.applyBindings(this, $(VM.selector)[0] );
 	};
 
-	return vm;
+	VM.getItems = function() {
+		return (this.KEYSTORE) ? VM.store.get(this.KEYSTORE) : [];
+	};
+
+	return VM;
 
 });

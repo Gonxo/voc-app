@@ -2,15 +2,15 @@ define(['knockout', './basevm', 'text!../templates/home.html'],
 
 function(ko, BaseVM, htmlString) {
 
-	var vm = {
-		intro: 'TODO: Template for home view',
+
+	var VM = ko.utils.extend({}, BaseVM);
+
+	VM.dashboard = function(ctx) {
+
+		VM.title = 'Home';
+		VM.render(htmlString);
 	};
 
-	ko.utils.extend(vm, BaseVM);
-
-	vm.app.route('get', '#/', function(ctx){
-
-		vm.render(htmlString);
-	});
+	return VM;
 
 });

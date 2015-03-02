@@ -1,0 +1,32 @@
+<h2 class="text-center" data-bind="text: title"></h2>
+
+<form data-bind="attr: { action: action, method: item.id() ? 'put' : 'post' }, with: item">
+
+	<div class="form-group">
+		<label for="word_label">Word</label><br />
+		<input type="text" name="label" id="word_label" class="form-control"
+			   data-bind="value: label, valueUpdate: 'afterkeydown'" />
+	</div>
+
+	<div class="form-group">
+		<label for="word_category">Category</label><br />
+		<select id="word_category" name="cat_id"
+				data-bind="options: $root.categories,
+						   optionsText: 'label',
+						   optionsValue: 'id',
+						   optionsCaption: 'Choose a category',
+						   value: cat_id">
+		</select>
+	</div>
+
+	<div class="form-group">
+		<label for="word_description">Short description</label><br />
+		<textarea name="description" id="word_description" class="form-control"
+				  data-bind="value: description, valueUpdate: 'afterkeydown'"></textarea>
+	</div>
+
+	<a href="#/words" class="btn btn-danger">Cancel</a>
+	<button type="submit" class="btn btn-success"
+			data-bind="visible: label() && description() && cat_id()">Save</button>
+
+</form>
