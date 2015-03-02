@@ -4,10 +4,10 @@ define(['knockout', 'komapping', './basevm',
 function(ko, komapping, BaseVM, EditTmpl, ListTmpl) {
 
 	// Single category view-model
-	var Category = {
-		id: ko.observable(),
-		label: ko.observable(),
-		description: ko.observable(),
+	var Category = function(){
+		this.id = ko.observable();
+		this.label = ko.observable();
+		this.description = ko.observable();
 	},
 		VM = ko.utils.extend({ KEYSTORE: 'categories', items: ko.observableArray() }, BaseVM);
 
@@ -18,7 +18,7 @@ function(ko, komapping, BaseVM, EditTmpl, ListTmpl) {
 		VM.items(
 			ko.utils.arrayMap(VM.store.get(VM.KEYSTORE) || [],
 				function(item) {
-					return komapping.fromJS(item, Category);
+					return komapping.fromJS(item, new Category());
 		}));
 
 		VM.title = 'Categories';
@@ -41,7 +41,7 @@ function(ko, komapping, BaseVM, EditTmpl, ListTmpl) {
 		VM.action = '#/category';
 
 		if(ctx.params.id === "add") {
-			VM.item = Category;
+			VM.item = new Category();
 			VM.title = 'Add new category';
 		} else {
 			VM.item = ko.utils.arrayFirst(VM.items(), function(item) {
@@ -66,7 +66,7 @@ function(ko, komapping, BaseVM, EditTmpl, ListTmpl) {
 		VM.items.push(komapping.fromJS(ctx.params, Category));
 
 		// Save entire collection at LocalStorage
-		VM.store.set(VM.KEYSTORE, ko.toJSON(VM.items()));
+		VM.store.set(VM.KEYSTORE, ko.toJSON(komapping.toJS(VM.items())));
 
 		window.location.hash = '#/categories';
 	};
@@ -83,7 +83,7 @@ function(ko, komapping, BaseVM, EditTmpl, ListTmpl) {
 		VM.item.description(ctx.params.description);
 
 		// Save entire collection at LocalStorage
-		VM.store.set(VM.KEYSTORE, ko.toJSON(VM.items()));
+		VM.store.set(VM.KEYSTORE, ko.toJSON(komapping.toJS(VM.items())));
 
 		window.location.hash = '#/categories';
 	};

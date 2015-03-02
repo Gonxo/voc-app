@@ -22,7 +22,9 @@
 	<li class="list-group-item clearfix">
 		<a data-bind="attr: {href: '#/word/' + $data.id()}" title="Edit">
 			<strong data-bind="text: $data.label" class="col-sm-2"></strong>
-			<span data-bind="text: $data.description().substring(0,50) + '...'"  class="col-sm-8"></span>
+			<strong data-bind="text: $parent.getCategory($data.cat_id())"
+					class="col-sm-2 alert-warning"></strong>
+			<span data-bind="text: $data.description().substring(0,50) + '...'"  class="col-sm-6"></span>
 		</a>
 		<form method="delete" class="pull-right" 
 			  data-bind="attr: {action: '#/word/' + $data.id()}">

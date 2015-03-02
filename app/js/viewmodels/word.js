@@ -4,36 +4,33 @@ define(['knockout', 'komapping', './basevm', './category',
 function(ko, komapping, BaseVM, Category, EditTmpl, ListTmpl) {
 
 	// Single word view-model
-	var Word = {
-		id: ko.observable(),
-		label: ko.observable(),
-		cat_id: ko.observable(),
-		description: ko.observable(),
-		//categories: Category.getItems() || [],
+	var Word = function(){
+		this.id = ko.observable();
+		this.label = ko.observable();
+		this.cat_id = ko.observable();
+		this.description = ko.observable();
 	},
 		VM = ko.utils.extend({ KEYSTORE: 'words', items: ko.observableArray() }, BaseVM);
-
-	/*Word.category = ko.computed(function(){
-		var self = this;
-		return ko.utils.arrayFirst(Category.getItems(), function(item){
-			if(self.cat_id() == item.id) {
-				return item.label();
-			}
-		});
-	}, Word);*/
 	
 	VM.categories = Category.getItems() || [];
 
+	VM.getCategory = function(cat_id){
+		var category = ko.utils.arrayFirst(VM.categories, function(item){
+			if(cat_id == item.id) {
+				return item;
+			}
+		});
+		return category.label;
+	};
+
 // Gets list of words
 	VM.get_list = function(ctx) {
-
-		//$parentContext
 
 		// Initially, check for words in LocalStorage
 		VM.items(
 			ko.utils.arrayMap(VM.store.get(VM.KEYSTORE) || [],
 				function(item) {
-					return komapping.fromJS(item, Word);
+					return komapping.fromJS(item, new Word());
 		}));
 
 		VM.title = 'Words';
@@ -51,7 +48,7 @@ function(ko, komapping, BaseVM, Category, EditTmpl, ListTmpl) {
 		VM.action = '#/word';
 
 		if(ctx.params.id === "add") {
-			VM.item = Word;
+			VM.item = new Word();
 			VM.title = 'Add new category';
 		} else {
 			VM.item = ko.utils.arrayFirst(VM.items(), function(item) {
@@ -73,13 +70,12 @@ function(ko, komapping, BaseVM, Category, EditTmpl, ListTmpl) {
 			VM.items()[VM.items().length-1].id()+1 : 1;
 
 		// Push new item at collection
-		VM.items.push(komapping.fromJS(ctx.params));
+		VM.items.push(komapping.fromJS(ctx.params, Word));
 
-		console.log(ko.toJS(VM.items()));
 		// Save entire collection at LocalStorage
-		//VM.store.set(VM.KEYSTORE, ko.toJSON(VM.items()));
+		VM.store.set(VM.KEYSTORE, ko.toJSON(komapping.toJS(VM.items())));
 
-		//window.location.hash = '#/words';
+		window.location.hash = '#/words';
 	};
 
 // Edit word
