@@ -4,6 +4,7 @@ function(Sammy){
 
 	// Returns the Sammy Application instance
 	var vocApp = Sammy('#vocApp').use('Storage');
+		vocApp.use('Application');
 
 	vocApp.store = new Sammy.Store({name: 'VocApp', element: '#vocApp', type: 'local'});
 	

@@ -68,6 +68,8 @@ function(ko, komapping, BaseVM, EditTmpl, ListTmpl) {
 		// Save entire collection at LocalStorage
 		VM.store.set(VM.KEYSTORE, ko.toJSON(komapping.toJS(VM.items())));
 
+		VM.trigger('add-category');
+
 		window.location.hash = '#/categories';
 	};
 

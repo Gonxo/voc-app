@@ -16,7 +16,7 @@ requirejs.config({
 
 });
 
-requirejs(['./app', './components/_loader', './routes'],
+requirejs(['./app', './components/_loader', './routes', './events'],
 
 function(App){
 

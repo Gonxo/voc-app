@@ -4,7 +4,13 @@ function(ko, App) {
 
 	var VM = {
 
+		bind: App.bind,
+
 		store: App.store,
+
+		trigger: function(name, data){ 
+			App.trigger(name, data);
+		},
 
 		selector: App.$element().find('#appView').selector,
 	};
