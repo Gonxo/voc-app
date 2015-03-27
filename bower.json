@@ -24,6 +24,7 @@
     "knockout": "~3.3.0",
     "sammy": "~0.7.6",
     "requirejs-text": "~2.0.14",
-    "knockout-mapping": "~2.4.1"
+    "knockout-mapping": "~2.4.1",
+    "d3": "~3.5.5"
   }
 }

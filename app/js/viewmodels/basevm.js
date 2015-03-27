@@ -1,33 +1,50 @@
-define(['knockout', '../app'],
+define(['knockout', 'komapping', '../app'],
 
-function(ko, App) {
+function(ko, komapping, App) {
 
-	var VM = {
+	function BaseVM(params) {
 
-		bind: App.bind,
+		var self = this;
 
-		store: App.store,
+		ko.utils.extend(self, params);
 
-		trigger: function(name, data){ 
+		self.store = App.store;
+
+		self.items = ko.observableArray();
+
+		self.selector = App.$element().find('#appView').selector;
+
+		self.bind = function(event, callback) {
+			App.bind(event, callback);
+		};
+
+		self.trigger = function(name, data) {
+
 			App.trigger(name, data);
-		},
+		};
 
-		selector: App.$element().find('#appView').selector,
-	};
+		self.render = function(viewmodel, htmlString) {
 
-	VM.render = function(htmlString) {
+			ko.cleanNode($(self.selector)[0]);
+			$(self.selector).html(htmlString);
+			ko.applyBindings(viewmodel, $(self.selector)[0]);
+		};
 
-		ko.cleanNode( $(VM.selector)[0] );
-			
-		$(VM.selector).html(htmlString);
+		self.mapItems = function() {
 
-		ko.applyBindings(this, $(VM.selector)[0] );
-	};
+			var ls_items = self.store.get(self.KEYSTORE) || [];
+			self.items(ko.utils.arrayMap(ls_items, function(item) {
+				return komapping.fromJS(item, new self.mapObj());
+			}));
+		};
 
-	VM.getItems = function() {
-		return (this.KEYSTORE) ? VM.store.get(this.KEYSTORE) : [];
-	};
+		// Save entire collection at LocalStorage
+		self.save = function() {
 
-	return VM;
+			self.store.set(self.KEYSTORE, ko.toJSON(komapping.toJS(self.items())));
+		};
+	}
+
+	return BaseVM;
 
 });

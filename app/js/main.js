@@ -8,6 +8,7 @@ requirejs.config({
 		sammy:			'../../bower_components/sammy/lib/sammy',
 		'Sammy.JSON':	'../../bower_components/sammy/lib/plugins/sammy.json',
 		'Sammy.Storage':'../../bower_components/sammy/lib/plugins/sammy.storage',
+		d3:				'../../bower_components/d3/d3',
 	},
 
 	shim: {
@@ -16,7 +17,7 @@ requirejs.config({
 
 });
 
-requirejs(['./app', './components/_loader', './routes', './events'],
+requirejs(['./app', './components/_loader', './routes'],
 
 function(App){
 

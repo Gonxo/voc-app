@@ -3,108 +3,115 @@ define(['knockout', 'komapping', './basevm',
 
 function(ko, komapping, BaseVM, EditTmpl, ListTmpl) {
 
-	// Single category view-model
-	var Category = function(){
+
+	// Single category View-Model
+	var Category = function() {
+
 		this.id = ko.observable();
 		this.label = ko.observable();
 		this.description = ko.observable();
-	},
-		VM = ko.utils.extend({ KEYSTORE: 'categories', items: ko.observableArray() }, BaseVM);
-
-// Gets list of categories
-	VM.get_list = function(ctx){
-
-		// Initially, check for categories in LocalStorage
-		VM.items(
-			ko.utils.arrayMap(VM.store.get(VM.KEYSTORE) || [],
-				function(item) {
-					return komapping.fromJS(item, new Category());
-		}));
-
-		VM.title = 'Categories';
-		VM.render(ListTmpl);
 	};
 
-// Deletes list of categoires
-	VM.delete_list = function(ctx) {
+// Categories View-Model
+	function Categories() {
 
-		if(confirm('Do you really want to remove all categories?')) {
-			VM.items([]);
-			VM.store.clear(VM.KEYSTORE);
-			// TODO: delete all words
-		}
-	};
+		var self = this;
 
-// Gets category
-	VM.get_item = function(ctx) {
+		ko.utils.extend(self, new BaseVM(
+			{KEYSTORE: 'categories', mapObj: Category}));
 
-		VM.action = '#/category';
+		self.items.subscribe(function(changes) {
 
-		if(ctx.params.id === "add") {
-			VM.item = new Category();
-			VM.title = 'Add new category';
-		} else {
-			VM.item = ko.utils.arrayFirst(VM.items(), function(item) {
+			self.trigger('categories-change');
+		}, null, "arrayChange");
+
+	// Gets list of categories
+		self.get_list = function(ctx) {
+
+			self.title = 'Categories';
+
+			// Check for categories in LocalStorage and render list template.
+			self.mapItems();
+			self.render(self, ListTmpl);
+		};
+
+	// Deletes list of categoires
+		self.delete_list = function(ctx) {
+
+			if(confirm('Do you really want to remove all categories? This action also will remove all words.')) {
+				self.items([]);
+				self.save();
+				self.trigger('categories-remove');
+			}
+		};
+
+	// Gets category
+		self.get_item = function(ctx) {
+
+			self.action = '#/category';
+
+			if(ctx.params.id === "add") {
+				self.item = new Category();
+				self.title = 'Add new category';
+			} else {
+				self.item = ko.utils.arrayFirst(self.items(), function(item) {
+					if(item.id() == ctx.params.id)
+						return item;
+				});
+				self.title = 'Edit category';
+				self.action += '/' + self.item.id();
+			}
+
+			self.render(self, EditTmpl);
+		};
+
+	// Create category
+		self.post_item = function(ctx) {
+
+			// TODO: Check for duplicate labels
+			ctx.params.id = (self.items().length > 0) ?
+				self.items()[self.items().length-1].id()+1 : 1;
+
+			// Push new item at collection
+			self.items.push(komapping.fromJS(ctx.params, Category));
+			self.save();
+
+			window.location.hash = '#/categories';
+		};
+
+	// Edit category
+		self.put_item = function(ctx) {
+
+			self.item = ko.utils.arrayFirst(self.items(), function(item) {
 				if(item.id() == ctx.params.id)
 					return item;
 			});
-			VM.title = 'Edit category';
-			VM.action += '/' + VM.item.id();
-		}
 
-		VM.render(EditTmpl);
-	};
+			self.item.label(ctx.params.label);
+			self.item.description(ctx.params.description);
+			self.save();
 
-// Create category
-	VM.post_item = function(ctx) {
+			window.location.hash = '#/categories';
+		};
 
-		// TODO: Check label not exists 
-		ctx.params.id = (VM.items().length > 0) ?
-			VM.items()[VM.items().length-1].id()+1 : 1;
+	// Delete category
+		self.delete_item = function(ctx) {
 
-		// Push new item at collection
-		VM.items.push(komapping.fromJS(ctx.params, Category));
+			if(confirm("Do you really want to remove this category and the words related with it?")) {
 
-		// Save entire collection at LocalStorage
-		VM.store.set(VM.KEYSTORE, ko.toJSON(komapping.toJS(VM.items())));
+				ko.utils.arrayFirst(self.items(), function(item) {
+					if(item && item.id() == ctx.params.id) {
+						self.items.remove(item);
+						self.save();
 
-		VM.trigger('add-category');
+						self.trigger('categories-remove', {cat_id: ctx.params.id});
+					}
+				});
+			}
+		};
 
-		window.location.hash = '#/categories';
-	};
+	}
 
-// Edit category
-	VM.put_item = function(ctx) {
+	return new Categories();
 
-		VM.item = ko.utils.arrayFirst(VM.items(), function(item) {
-			if(item.id() == ctx.params.id)
-				return item;
-		});
-
-		VM.item.label(ctx.params.label);
-		VM.item.description(ctx.params.description);
-
-		// Save entire collection at LocalStorage
-		VM.store.set(VM.KEYSTORE, ko.toJSON(komapping.toJS(VM.items())));
-
-		window.location.hash = '#/categories';
-	};
-
-// Delete category
-	VM.delete_item = function(ctx) {
-
-		if(confirm("Do you really want to remove this category?")) {
-
-			var index = false;
-			ko.utils.arrayFirst(VM.items(), function(item, idx) {
-				if(item.id() == ctx.params.id)
-					index = idx;
-			});
-			VM.items.splice(index, 1);
-			VM.store.set(VM.KEYSTORE, ko.toJSON(VM.items()));
-			// TODO: delete related words
-		}
-	};
-
-	return VM;
 });

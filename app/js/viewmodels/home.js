@@ -2,15 +2,19 @@ define(['knockout', './basevm', 'text!../templates/home.html'],
 
 function(ko, BaseVM, htmlString) {
 
+	function Home() {
 
-	var VM = ko.utils.extend({}, BaseVM);
+		var self = this;
 
-	VM.dashboard = function(ctx) {
+		ko.utils.extend(self, new BaseVM());
 
-		VM.title = 'Home';
-		VM.render(htmlString);
-	};
+		self.dashboard = function(ctx) {
 
-	return VM;
+			self.title = 'Home';
+			self.render(self, htmlString);
+		};
+	}
+
+	return new Home();
 
 });
